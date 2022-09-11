@@ -20,7 +20,7 @@ The documentation is available on [docs.rs].
 
 ## License
 
-serde_urlencoded is licensed under either of
+comma_serde_urlencoded is licensed under either of
 
  * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
    http://www.apache.org/licenses/LICENSE-2.0)
@@ -30,6 +30,13 @@ serde_urlencoded is licensed under either of
 at your option.
 
 ### Contribution
+
+serde_urlencoded licenses
+
+ * Apache License, Version 2.0, ([NOX-LICENSE-APACHE](NOX-LICENSE-APACHE) or
+   http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([NOX-LICENSE-MIT](NOX-LICENSE-MIT) or
+   http://opensource.org/licenses/MIT)
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in serde_urlencoded by you, as defined in the Apache-2.0 license,
