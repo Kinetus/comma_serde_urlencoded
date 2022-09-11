@@ -16,16 +16,16 @@ use std::str;
 /// Serializes a value into a `application/x-www-form-urlencoded` `String` buffer.
 ///
 /// ```
-/// let meal = &[
-///     ("bread", "baguette"),
-///     ("cheese", "comté"),
-///     ("meat", "ham"),
-///     ("fat", "butter"),
-/// ];
+/// let meal = &(
+///     ("bread", ["baguette", "strucia"]),
+///     ("cheese", vec!["comté", "cheddar"]),
+///     ("meat", ("ham", "becon"))
+/// );
 ///
 /// assert_eq!(
 ///     comma_serde_urlencoded::to_string(meal),
-///     Ok("bread=baguette&cheese=comt%C3%A9&meat=ham&fat=butter".to_owned()));
+///     Ok("bread=baguette%2Cstrucia&cheese=comt%C3%A9%2Ccheddar&meat=ham%2Cbecon".to_owned())
+/// );
 /// ```
 pub fn to_string<T: ser::Serialize>(input: T) -> Result<String, Error> {
     let mut urlencoder = UrlEncodedSerializer::new("".to_owned());
