@@ -16,7 +16,7 @@ comma_serde_urlencoded = "0.7"
 The documentation is available on [docs.rs].
 
 [crates.io]: https://crates.io/crates/comma_serde_urlencoded
-[docs.rs]: https://docs.rs/comma_serde_urlencoded/0.7.2/comma_serde_urlencoded/
+[docs.rs]: https://docs.rs/comma_serde_urlencoded/0.7.3/comma_serde_urlencoded/
 
 ## License
 
