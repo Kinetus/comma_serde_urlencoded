@@ -1,4 +1,4 @@
-//! `x-www-form-urlencoded` meets Serde
+//! [`serde_urlencoded`](https://github.com/nox/serde_urlencoded) with support comma separeted sequences and tuples
 
 #![warn(unused_extern_crates)]
 #![forbid(unsafe_code)]
