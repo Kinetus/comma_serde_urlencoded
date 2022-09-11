@@ -1,5 +1,5 @@
 use crate::ser::Error;
-use serde::ser::{self, Error as SerError, SerializeSeq};
+use serde::ser;
 use std::str;
 
 pub struct PartSerializer<S> {

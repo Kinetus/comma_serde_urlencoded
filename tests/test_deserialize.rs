@@ -7,7 +7,7 @@ struct NewType<T>(T);
 fn deserialize_newtype_i32() {
     let result = vec![("field".to_owned(), NewType(11))];
 
-    assert_eq!(serde_urlencoded::from_str("field=11"), Ok(result));
+    assert_eq!(comma_serde_urlencoded::from_str("field=11"), Ok(result));
 }
 
 #[test]
@@ -15,7 +15,7 @@ fn deserialize_bytes() {
     let result = vec![("first".to_owned(), 23), ("last".to_owned(), 42)];
 
     assert_eq!(
-        serde_urlencoded::from_bytes(b"first=23&last=42"),
+        comma_serde_urlencoded::from_bytes(b"first=23&last=42"),
         Ok(result)
     );
 }
@@ -24,14 +24,14 @@ fn deserialize_bytes() {
 fn deserialize_str() {
     let result = vec![("first".to_owned(), 23), ("last".to_owned(), 42)];
 
-    assert_eq!(serde_urlencoded::from_str("first=23&last=42"), Ok(result));
+    assert_eq!(comma_serde_urlencoded::from_str("first=23&last=42"), Ok(result));
 }
 
 #[test]
 fn deserialize_borrowed_str() {
     let result = vec![("first", 23), ("last", 42)];
 
-    assert_eq!(serde_urlencoded::from_str("first=23&last=42"), Ok(result));
+    assert_eq!(comma_serde_urlencoded::from_str("first=23&last=42"), Ok(result));
 }
 
 #[test]
@@ -39,7 +39,7 @@ fn deserialize_reader() {
     let result = vec![("first".to_owned(), 23), ("last".to_owned(), 42)];
 
     assert_eq!(
-        serde_urlencoded::from_reader(b"first=23&last=42" as &[_]),
+        comma_serde_urlencoded::from_reader(b"first=23&last=42" as &[_]),
         Ok(result)
     );
 }
@@ -50,15 +50,15 @@ fn deserialize_option() {
         ("first".to_owned(), Some(23)),
         ("last".to_owned(), Some(42)),
     ];
-    assert_eq!(serde_urlencoded::from_str("first=23&last=42"), Ok(result));
+    assert_eq!(comma_serde_urlencoded::from_str("first=23&last=42"), Ok(result));
 }
 
 #[test]
 fn deserialize_unit() {
-    assert_eq!(serde_urlencoded::from_str(""), Ok(()));
-    assert_eq!(serde_urlencoded::from_str("&"), Ok(()));
-    assert_eq!(serde_urlencoded::from_str("&&"), Ok(()));
-    assert!(serde_urlencoded::from_str::<()>("first=23").is_err());
+    assert_eq!(comma_serde_urlencoded::from_str(""), Ok(()));
+    assert_eq!(comma_serde_urlencoded::from_str("&"), Ok(()));
+    assert_eq!(comma_serde_urlencoded::from_str("&&"), Ok(()));
+    assert!(comma_serde_urlencoded::from_str::<()>("first=23").is_err());
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -77,12 +77,12 @@ fn deserialize_unit_enum() {
     ];
 
     assert_eq!(
-        serde_urlencoded::from_str("one=A&two=B&three=C"),
+        comma_serde_urlencoded::from_str("one=A&two=B&three=C"),
         Ok(result)
     );
 }
 
 #[test]
 fn deserialize_unit_type() {
-    assert_eq!(serde_urlencoded::from_str(""), Ok(()));
+    assert_eq!(comma_serde_urlencoded::from_str(""), Ok(()));
 }
