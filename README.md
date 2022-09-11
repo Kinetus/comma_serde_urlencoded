@@ -1,6 +1,7 @@
-Comma_serde_urlencoded
+comma_serde_urlencoded
 ======================
-[`serde_urlencoded`] with support comma separeted sequences and tuples
+
+[`serde_urlencoded`] with support sequences and tuples
 
 Installation
 ============
@@ -17,6 +18,22 @@ The documentation is available on [docs.rs].
 
 [crates.io]: https://crates.io/crates/comma_serde_urlencoded
 [docs.rs]: https://docs.rs/comma_serde_urlencoded/0.7.4/comma_serde_urlencoded/
+
+Example
+=======
+
+```rust
+let meal = &(
+    ("bread", ["baguette", "strucia"]),
+    ("cheese", vec!["comté", "cheddar"]),
+    ("meat", ("ham", "becon"))
+);
+
+assert_eq!(
+    comma_serde_urlencoded::to_string(meal),
+    Ok("bread=baguette%2Cstrucia&cheese=comt%C3%A9%2Ccheddar&meat=ham%2Cbecon".to_owned())
+);
+```
 
 ## License
 
