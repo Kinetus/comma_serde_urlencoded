@@ -231,6 +231,21 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         visitor.visit_newtype_struct(self)
     }
 
+    fn deserialize_seq<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: de::Visitor<'de>
+    {
+        let value = match self.0 {
+            Cow::Borrowed(borrowed) => visitor.visit_seq(CommaSeparated::new(borrowed)),
+            Cow::Owned(owned) => unimplemented!()
+        };
+
+        value
+
+        // let value = visitor.visit_seq(CommaSeparated())?;
+        // Ok(value)
+    }
+
     forward_to_deserialize_any! {
         char
         str
@@ -244,7 +259,6 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         identifier
         tuple
         ignored_any
-        seq
         map
     }
 
@@ -260,6 +274,52 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         i64 => deserialize_i64,
         f32 => deserialize_f32,
         f64 => deserialize_f64,
+    }
+}
+
+struct CommaSeparated<'de> {
+    de: &'de str
+}
+
+impl<'de> CommaSeparated<'de> {
+    fn new(de: &'de str) -> CommaSeparated<'de>{
+        CommaSeparated {
+            de
+        }
+    }
+
+    fn next_comma_position(&self) -> Option<usize> {
+        self.de.chars().position(|x| x == ',')
+    }
+}
+
+impl<'de> de::SeqAccess<'de> for CommaSeparated<'de> {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: de::DeserializeSeed<'de>
+    {
+        if self.de.is_empty() {
+            return Ok(None)
+        }
+
+        let val = match self.next_comma_position() {
+            Some(index) => {
+                let res = seed.deserialize(Part(Cow::Borrowed(&self.de[0..index])).into_deserializer()).map(Some);
+                self.de = &self.de[index+1..];
+
+                res
+            },
+            None => {
+                let res = seed.deserialize(Part(Cow::Borrowed(&self.de[0..])).into_deserializer()).map(Some);
+                self.de = "";
+
+                res
+            }
+        };
+        
+        val
     }
 }
 
