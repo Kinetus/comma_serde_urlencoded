@@ -231,6 +231,16 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         visitor.visit_newtype_struct(self)
     }
 
+    fn deserialize_seq<V>(self, visitor: V) -> Result<V::Value, Self::Error>
+    where
+        V: de::Visitor<'de>
+    {
+        match self.0 {
+            Cow::Borrowed(borrowed) => visitor.visit_seq(CommaSeparatedBorrowed::new(borrowed)),
+            Cow::Owned(owned) => visitor.visit_seq(CommaSeparatedOwned::new(owned.rsplit(',').map(str::to_string).collect()))
+        }
+    }
+
     forward_to_deserialize_any! {
         char
         str
@@ -244,7 +254,6 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         identifier
         tuple
         ignored_any
-        seq
         map
     }
 
@@ -260,6 +269,82 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
         i64 => deserialize_i64,
         f32 => deserialize_f32,
         f64 => deserialize_f64,
+    }
+}
+
+struct CommaSeparatedBorrowed<'de> {
+    de: &'de str
+}
+
+impl<'de> CommaSeparatedBorrowed<'de> {
+    fn new(de: &'de str) -> CommaSeparatedBorrowed<'de>{
+        CommaSeparatedBorrowed {
+            de
+        }
+    }
+
+    fn get_next_comma_position(&self) -> Option<usize> {
+        self.de.chars().position(|x| x == ',')
+    }
+
+    fn get_slice(&mut self) -> &'de str {
+        match self.get_next_comma_position() {
+            Some(pos) => {
+                let res = &self.de[..pos];
+                self.de = &self.de[pos+1..];
+
+                res
+            }
+            None => {
+                let res = &self.de[..];
+                self.de = "";
+
+                res
+            }
+        }
+    }
+}
+
+impl<'de> de::SeqAccess<'de> for CommaSeparatedBorrowed<'de> {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: de::DeserializeSeed<'de>
+    {
+        if self.de.is_empty() {
+            return Ok(None)
+        }
+
+        seed.deserialize(Part(Cow::Borrowed(self.get_slice())).into_deserializer()).map(Some)
+    }
+}
+
+struct CommaSeparatedOwned {
+    de: Vec<String>
+}
+
+impl CommaSeparatedOwned {
+    pub fn new(de: Vec<String>) -> CommaSeparatedOwned {
+        CommaSeparatedOwned {
+            de
+        }
+    }
+}
+
+impl<'de> de::SeqAccess<'de> for CommaSeparatedOwned {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: de::DeserializeSeed<'de>
+    {
+        match self.de.pop() {
+            Some(value) => {
+                seed.deserialize(Part(Cow::Owned(value)).into_deserializer()).map(Some)
+            },
+            None => Ok(None)
+        }
     }
 }
 

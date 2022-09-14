@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use serde_derive::Deserialize;
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -85,4 +87,11 @@ fn deserialize_unit_enum() {
 #[test]
 fn deserialize_unit_type() {
     assert_eq!(comma_serde_urlencoded::from_str(""), Ok(()));
+}
+
+#[test]
+fn deserialize() {
+    let a: Result<HashMap<String, Vec<i32>>, comma_serde_urlencoded::de::Error> = comma_serde_urlencoded::from_str("one=1,2");
+
+    println!("{:?}", a);
 }
