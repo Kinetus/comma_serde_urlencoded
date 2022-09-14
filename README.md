@@ -17,7 +17,7 @@ comma_serde_urlencoded = "0.8"
 The documentation is available on [docs.rs].
 
 [crates.io]: https://crates.io/crates/comma_serde_urlencoded
-[docs.rs]: https://docs.rs/comma_serde_urlencoded/0.8.0/comma_serde_urlencoded/
+[docs.rs]: https://docs.rs/comma_serde_urlencoded/0.8.1/comma_serde_urlencoded/
 
 Example
 =======
