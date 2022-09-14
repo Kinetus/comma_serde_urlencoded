@@ -19,12 +19,13 @@ use std::str;
 /// let meal = &(
 ///     ("bread", ["baguette", "strucia"]),
 ///     ("cheese", vec!["comté", "cheddar"]),
-///     ("meat", ("ham", "becon"))
+///     ("meat", ("ham", "becon")),
+///     ("fat", "butter"),
 /// );
 ///
 /// assert_eq!(
 ///     comma_serde_urlencoded::to_string(meal),
-///     Ok("bread=baguette%2Cstrucia&cheese=comt%C3%A9%2Ccheddar&meat=ham%2Cbecon".to_owned())
+///     Ok("bread=baguette%2Cstrucia&cheese=comt%C3%A9%2Ccheddar&meat=ham%2Cbecon&fat=butter".to_owned())
 /// );
 /// ```
 pub fn to_string<T: ser::Serialize>(input: T) -> Result<String, Error> {
