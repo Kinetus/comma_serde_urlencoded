@@ -235,15 +235,10 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
     where
         V: de::Visitor<'de>
     {
-        let value = match self.0 {
-            Cow::Borrowed(borrowed) => visitor.visit_seq(CommaSeparated::new(borrowed)),
-            Cow::Owned(owned) => unimplemented!()
-        };
-
-        value
-
-        // let value = visitor.visit_seq(CommaSeparated())?;
-        // Ok(value)
+        match self.0 {
+            Cow::Borrowed(borrowed) => visitor.visit_seq(CommaSeparatedBorrowed::new(borrowed)),
+            Cow::Owned(owned) => visitor.visit_seq(CommaSeparatedOwned::new(owned.rsplit(',').map(str::to_string).collect()))
+        }
     }
 
     forward_to_deserialize_any! {
@@ -277,13 +272,13 @@ impl<'de> de::Deserializer<'de> for Part<'de> {
     }
 }
 
-struct CommaSeparated<'de> {
+struct CommaSeparatedBorrowed<'de> {
     de: &'de str
 }
 
-impl<'de> CommaSeparated<'de> {
-    fn new(de: &'de str) -> CommaSeparated<'de>{
-        CommaSeparated {
+impl<'de> CommaSeparatedBorrowed<'de> {
+    fn new(de: &'de str) -> CommaSeparatedBorrowed<'de>{
+        CommaSeparatedBorrowed {
             de
         }
     }
@@ -310,7 +305,7 @@ impl<'de> CommaSeparated<'de> {
     }
 }
 
-impl<'de> de::SeqAccess<'de> for CommaSeparated<'de> {
+impl<'de> de::SeqAccess<'de> for CommaSeparatedBorrowed<'de> {
     type Error = Error;
 
     fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
@@ -322,6 +317,34 @@ impl<'de> de::SeqAccess<'de> for CommaSeparated<'de> {
         }
 
         seed.deserialize(Part(Cow::Borrowed(self.get_slice())).into_deserializer()).map(Some)
+    }
+}
+
+struct CommaSeparatedOwned {
+    de: Vec<String>
+}
+
+impl CommaSeparatedOwned {
+    pub fn new(de: Vec<String>) -> CommaSeparatedOwned {
+        CommaSeparatedOwned {
+            de
+        }
+    }
+}
+
+impl<'de> de::SeqAccess<'de> for CommaSeparatedOwned {
+    type Error = Error;
+
+    fn next_element_seed<T>(&mut self, seed: T) -> Result<Option<T::Value>, Self::Error>
+    where
+        T: de::DeserializeSeed<'de>
+    {
+        match self.de.pop() {
+            Some(value) => {
+                seed.deserialize(Part(Cow::Owned(value)).into_deserializer()).map(Some)
+            },
+            None => Ok(None)
+        }
     }
 }
 
