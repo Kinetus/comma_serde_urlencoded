@@ -1,7 +1,7 @@
 comma_serde_urlencoded
 ======================
 
-[`serde_urlencoded`] with support for serialization of sequences and tuples in comma separated format.
+[`serde_urlencoded`] with support for serialization and deserialization of sequences and tuples in comma separated format.
 
 Installation
 ============
