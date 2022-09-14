@@ -288,8 +288,25 @@ impl<'de> CommaSeparated<'de> {
         }
     }
 
-    fn next_comma_position(&self) -> Option<usize> {
+    fn get_next_comma_position(&self) -> Option<usize> {
         self.de.chars().position(|x| x == ',')
+    }
+
+    fn get_slice(&mut self) -> &'de str {
+        match self.get_next_comma_position() {
+            Some(pos) => {
+                let res = &self.de[..pos];
+                self.de = &self.de[pos+1..];
+
+                res
+            }
+            None => {
+                let res = &self.de[..];
+                self.de = "";
+
+                res
+            }
+        }
     }
 }
 
@@ -304,22 +321,7 @@ impl<'de> de::SeqAccess<'de> for CommaSeparated<'de> {
             return Ok(None)
         }
 
-        let val = match self.next_comma_position() {
-            Some(index) => {
-                let res = seed.deserialize(Part(Cow::Borrowed(&self.de[0..index])).into_deserializer()).map(Some);
-                self.de = &self.de[index+1..];
-
-                res
-            },
-            None => {
-                let res = seed.deserialize(Part(Cow::Borrowed(&self.de[0..])).into_deserializer()).map(Some);
-                self.de = "";
-
-                res
-            }
-        };
-        
-        val
+        seed.deserialize(Part(Cow::Borrowed(self.get_slice())).into_deserializer()).map(Some)
     }
 }
 
